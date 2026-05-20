@@ -1,13 +1,13 @@
 # =========================================
 # RapIQ STREAMLIT APP
-# Premium UI Refactor
+# Premium Futuristic UI
+# FIXED VERSION
 # =========================================
 
 import streamlit as st
 import pandas as pd
 import numpy as np
 import joblib
-import plotly.express as px
 import plotly.graph_objects as go
 
 # =========================================
@@ -30,13 +30,21 @@ st.markdown("""
 
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
-html, body, [class*="css"]  {
+html, body, [class*="css"] {
     font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
 .stApp {
-    background: #070B1A;
+    background: #050816;
     color: white;
+}
+
+/* REMOVE STREAMLIT PADDING */
+
+.block-container {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    max-width: 1500px;
 }
 
 /* SIDEBAR */
@@ -44,25 +52,31 @@ html, body, [class*="css"]  {
 section[data-testid="stSidebar"] {
     background: linear-gradient(
         180deg,
-        #081120,
-        #050B18
+        #07111F,
+        #040A14
     );
-    border-right: 1px solid rgba(60,215,255,0.15);
+    border-right: 1px solid rgba(0,212,255,0.12);
 }
 
 .sidebar-title {
-    font-size: 32px;
+    font-size: 34px;
     font-weight: 800;
     color: white;
-    margin-bottom: 0;
+    margin-bottom: 0px;
 }
 
 .sidebar-sub {
-    color: #6EE7FF;
-    font-size: 12px;
+    color: #00D4FF;
+    font-size: 11px;
     letter-spacing: 1px;
-    margin-top: -10px;
+    margin-top: -5px;
     margin-bottom: 30px;
+}
+
+/* HIDE STREAMLIT RADIO TITLE */
+
+div[role="radiogroup"] label {
+    color: white !important;
 }
 
 /* HERO */
@@ -71,111 +85,169 @@ section[data-testid="stSidebar"] {
     background:
         linear-gradient(
             135deg,
-            rgba(18,25,40,0.95),
-            rgba(10,15,30,0.85)
+            rgba(15,20,35,0.95),
+            rgba(8,12,25,0.92)
         );
 
-    border: 1px solid rgba(60,215,255,0.12);
+    border: 1px solid rgba(0,212,255,0.12);
+
     border-radius: 28px;
-    padding: 40px;
-    margin-bottom: 25px;
-    backdrop-filter: blur(20px);
+
+    padding: 45px;
+
+    margin-bottom: 28px;
+
+    backdrop-filter: blur(18px);
 
     box-shadow:
-        0 0 40px rgba(60,215,255,0.08);
+        0 0 45px rgba(0,212,255,0.06);
 }
 
 /* GLASS CARD */
 
 .glass-card {
-    background: rgba(20,25,40,0.55);
-    border: 1px solid rgba(60,215,255,0.12);
+    background: rgba(18,22,38,0.70);
+
+    border: 1px solid rgba(0,212,255,0.10);
+
     border-radius: 24px;
+
     padding: 28px;
+
     backdrop-filter: blur(20px);
 
     box-shadow:
-        0 0 25px rgba(60,215,255,0.05);
+        0 0 25px rgba(0,212,255,0.05);
+
+    margin-bottom: 25px;
 }
 
 /* RESULT CARD */
 
 .result-card {
+
     background: linear-gradient(
         135deg,
         rgba(0,212,255,0.18),
-        rgba(87,27,193,0.18)
+        rgba(87,27,193,0.20)
     );
 
     border: 1px solid rgba(255,255,255,0.08);
+
     border-radius: 24px;
+
     padding: 30px;
 
+    height: 100%;
+
     box-shadow:
-        0 0 35px rgba(60,215,255,0.15);
+        0 0 35px rgba(0,212,255,0.15);
 }
 
-/* METRIC */
+/* METRIC CARD */
 
 .metric-card {
-    background: rgba(20,25,40,0.55);
-    border: 1px solid rgba(60,215,255,0.10);
-    border-radius: 20px;
-    padding: 25px;
+    background: rgba(18,22,38,0.70);
+
+    border: 1px solid rgba(0,212,255,0.10);
+
+    border-radius: 22px;
+
+    padding: 30px;
+
     text-align: center;
+
+    height: 180px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
-/* TEXT */
-
-.section-title {
-    color: white;
-    font-size: 24px;
-    font-weight: 700;
-    margin-bottom: 20px;
-}
-
-.small-label {
-    color: #9FB3C8;
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    margin-bottom: 6px;
-}
+/* TITLES */
 
 .main-title {
-    font-size: 58px;
+
+    font-size: 64px;
+
     font-weight: 800;
-    line-height: 1;
+
     color: white;
+
     margin-bottom: 15px;
+
+    line-height: 1;
 }
 
 .main-desc {
+
     color: #B7C4D6;
+
     font-size: 18px;
+
     line-height: 1.8;
+
     max-width: 700px;
 }
 
+.section-title {
+
+    color: white;
+
+    font-size: 24px;
+
+    font-weight: 700;
+
+    margin-bottom: 22px;
+}
+
+.small-label {
+
+    color: #8FA5C0;
+
+    font-size: 12px;
+
+    letter-spacing: 1px;
+
+    font-weight: 600;
+
+    margin-bottom: 8px;
+}
+
 .prediction-label {
+
     color: #00D4FF;
+
     font-size: 42px;
+
     font-weight: 800;
-    margin-top: 10px;
+
+    line-height: 1.1;
+
+    margin-bottom: 20px;
 }
 
 .confidence-label {
+
     color: #D0BCFF;
-    font-size: 20px;
-    font-weight: 700;
+
+    font-size: 16px;
+
+    margin-bottom: 10px;
+
+    font-weight: 600;
 }
 
 /* BUTTON */
 
 div.stButton > button {
+
     width: 100%;
-    height: 62px;
+
+    height: 65px;
+
     border-radius: 999px;
+
     border: none;
 
     background: linear-gradient(
@@ -185,23 +257,26 @@ div.stButton > button {
     );
 
     color: white;
+
     font-size: 18px;
+
     font-weight: 700;
 
     box-shadow:
-        0 0 30px rgba(60,215,255,0.35);
+        0 0 35px rgba(0,212,255,0.30);
 
     transition: 0.3s ease;
 }
 
 div.stButton > button:hover {
+
     transform: scale(1.02);
 
     box-shadow:
-        0 0 40px rgba(60,215,255,0.50);
+        0 0 50px rgba(0,212,255,0.50);
 }
 
-/* INPUT */
+/* INPUTS */
 
 .stSelectbox label,
 .stNumberInput label {
@@ -210,33 +285,64 @@ div.stButton > button:hover {
 }
 
 div[data-baseweb="select"] > div {
-    background-color: rgba(15,20,30,0.90) !important;
-    border: 1px solid rgba(60,215,255,0.18) !important;
+
+    background-color: rgba(10,15,25,0.95) !important;
+
+    border: 1px solid rgba(0,212,255,0.15) !important;
+
     border-radius: 14px !important;
 }
 
 .stNumberInput input {
-    background-color: rgba(15,20,30,0.90) !important;
+
+    background-color: rgba(10,15,25,0.95) !important;
+
     color: white !important;
+
     border-radius: 14px !important;
-    border: 1px solid rgba(60,215,255,0.18) !important;
+
+    border: 1px solid rgba(0,212,255,0.15) !important;
 }
 
 /* DATAFRAME */
 
-.stDataFrame {
-    border-radius: 18px;
+[data-testid="stDataFrame"] {
+
+    border-radius: 20px;
+
     overflow: hidden;
+
+    border: 1px solid rgba(0,212,255,0.08);
 }
 
-/* UPLOAD */
+/* FILE UPLOADER */
 
-.upload-box {
-    background: rgba(20,25,40,0.55);
-    border: 2px dashed rgba(60,215,255,0.25);
-    border-radius: 24px;
-    padding: 40px;
-    text-align: center;
+[data-testid="stFileUploader"] {
+
+    background: rgba(15,20,35,0.7);
+
+    border: 2px dashed rgba(0,212,255,0.20);
+
+    border-radius: 20px;
+
+    padding: 20px;
+}
+
+/* INFO BOX */
+
+.info-box {
+
+    background: rgba(0,212,255,0.08);
+
+    border-left: 4px solid #00D4FF;
+
+    padding: 16px;
+
+    border-radius: 14px;
+
+    color: #D7E6F5;
+
+    line-height: 1.7;
 }
 
 </style>
@@ -249,10 +355,17 @@ div[data-baseweb="select"] > div {
 @st.cache_resource
 def load_model():
 
-    model = joblib.load("model_mlp_iq.pkl")
-    scaler = joblib.load("scaler_iq.pkl")
+    try:
 
-    return model, scaler
+        model = joblib.load("model_mlp_iq.pkl")
+        scaler = joblib.load("scaler_iq.pkl")
+
+        return model, scaler
+
+    except Exception as e:
+
+        st.error(f"Model loading error: {e}")
+        st.stop()
 
 model, scaler = load_model()
 
@@ -305,8 +418,9 @@ required_columns = [
 
 st.sidebar.markdown("""
 <div class="sidebar-title">RapIQ</div>
+
 <div class="sidebar-sub">
-MLP ARCHITECTURE : (10, 6)
+MLP ARCHITECTURE : (10,6)
 </div>
 """, unsafe_allow_html=True)
 
@@ -327,15 +441,18 @@ if menu == "Single Prediction":
 
     st.markdown("""
     <div class="hero-card">
-        <div class="main-title">RapIQ</div>
+
+        <div class="main-title">
+            RapIQ
+        </div>
 
         <div class="main-desc">
-            Cognitive potential orchestration.
-            Predict child IQ category using
-            Multilayer Perceptron (MLP)
-            based on parental education,
-            age, and gender.
+            Cognitive intelligence classification system
+            powered by Multilayer Perceptron (MLP)
+            architecture for rapid IQ category prediction
+            based on socio-demographic indicators.
         </div>
+
     </div>
     """, unsafe_allow_html=True)
 
@@ -343,15 +460,13 @@ if menu == "Single Prediction":
 
     with col1:
 
-        st.markdown(
-            '<div class="glass-card">',
-            unsafe_allow_html=True
-        )
+        st.markdown('<div class="glass-card">', unsafe_allow_html=True)
 
-        st.markdown(
-            '<div class="section-title">👨‍👩‍👧 Family Information</div>',
-            unsafe_allow_html=True
-        )
+        st.markdown("""
+        <div class="section-title">
+            👨‍👩‍👧 Family Information
+        </div>
+        """, unsafe_allow_html=True)
 
         education_mother = st.selectbox(
             "Mother Education Level",
@@ -367,15 +482,13 @@ if menu == "Single Prediction":
 
     with col2:
 
-        st.markdown(
-            '<div class="glass-card">',
-            unsafe_allow_html=True
-        )
+        st.markdown('<div class="glass-card">', unsafe_allow_html=True)
 
-        st.markdown(
-            '<div class="section-title">🧒 Child Information</div>',
-            unsafe_allow_html=True
-        )
+        st.markdown("""
+        <div class="section-title">
+            🧒 Child Information
+        </div>
+        """, unsafe_allow_html=True)
 
         age = st.number_input(
             "Age (Years)",
@@ -391,11 +504,9 @@ if menu == "Single Prediction":
 
         st.markdown('</div>', unsafe_allow_html=True)
 
-    st.markdown("<br>", unsafe_allow_html=True)
+    btn1, btn2, btn3 = st.columns([1,2,1])
 
-    button_col1, button_col2, button_col3 = st.columns([1,2,1])
-
-    with button_col2:
+    with btn2:
 
         predict_btn = st.button(
             "🚀 Predict IQ Category"
@@ -406,19 +517,10 @@ if menu == "Single Prediction":
         try:
 
             input_data = pd.DataFrame({
-                "education_mother": [
-                    edu_map[education_mother]
-                ],
-
-                "education_father": [
-                    edu_map[education_father]
-                ],
-
+                "education_mother": [edu_map[education_mother]],
+                "education_father": [edu_map[education_father]],
                 "age_years": [age],
-
-                "gender": [
-                    gender_map[gender]
-                ]
+                "gender": [gender_map[gender]]
             })
 
             scaled_data = scaler.transform(input_data)
@@ -436,53 +538,42 @@ if menu == "Single Prediction":
                 "Probability": probabilities * 100
             })
 
-            colors = [
-                "#1E293B"
-                for _ in range(len(prob_df))
-            ]
+            colors = ["#1E293B"] * len(prob_df)
 
-            max_idx = prob_df[
-                "Probability"
-            ].idxmax()
+            colors[
+                prob_df["Probability"].idxmax()
+            ] = "#00D4FF"
 
-            colors[max_idx] = "#00D4FF"
+            fig = go.Figure()
 
-            fig = go.Figure(
-                data=[
-                    go.Bar(
-                        x=prob_df["Category"],
-                        y=prob_df["Probability"],
-                        marker_color=colors,
-
-                        text=[
-                            f"{x:.1f}%"
-                            for x in prob_df["Probability"]
-                        ],
-
-                        textposition='outside'
-                    )
-                ]
+            fig.add_trace(
+                go.Bar(
+                    x=prob_df["Category"],
+                    y=prob_df["Probability"],
+                    marker_color=colors,
+                    text=[
+                        f"{x:.1f}%"
+                        for x in prob_df["Probability"]
+                    ],
+                    textposition="outside"
+                )
             )
 
             fig.update_layout(
                 template="plotly_dark",
-
+                height=430,
                 paper_bgcolor='rgba(0,0,0,0)',
-
                 plot_bgcolor='rgba(0,0,0,0)',
-
-                height=420,
-
                 font=dict(
-                    color='white',
-                    family='Plus Jakarta Sans'
+                    color="white",
+                    family="Plus Jakarta Sans"
                 ),
-
-                xaxis=dict(showgrid=False),
-
                 yaxis=dict(
                     range=[0,100],
-                    gridcolor='rgba(255,255,255,0.08)'
+                    gridcolor="rgba(255,255,255,0.08)"
+                ),
+                xaxis=dict(
+                    showgrid=False
                 )
             )
 
@@ -490,25 +581,20 @@ if menu == "Single Prediction":
 
             with chart_col:
 
-                st.markdown(
-                    '<div class="glass-card">',
-                    unsafe_allow_html=True
-                )
+                st.markdown("""
+                <div class="glass-card">
 
-                st.markdown(
-                    '<div class="section-title">📊 Confidence Probability</div>',
-                    unsafe_allow_html=True
-                )
+                <div class="section-title">
+                    📊 Confidence Probability
+                </div>
+                """, unsafe_allow_html=True)
 
                 st.plotly_chart(
                     fig,
-                    use_container_width=True
+                    width='stretch'
                 )
 
-                st.markdown(
-                    '</div>',
-                    unsafe_allow_html=True
-                )
+                st.markdown("</div>", unsafe_allow_html=True)
 
             with result_col:
 
@@ -523,14 +609,12 @@ if menu == "Single Prediction":
                         {predicted_label}
                     </div>
 
-                    <br>
-
                     <div class="confidence-label">
                         Confidence Score
                     </div>
 
                     <div style="
-                        font-size:40px;
+                        font-size:48px;
                         font-weight:800;
                         color:white;
                     ">
@@ -542,9 +626,7 @@ if menu == "Single Prediction":
 
         except Exception as e:
 
-            st.error(
-                f"Prediction Error: {e}"
-            )
+            st.error(f"Prediction Error: {e}")
 
 # =========================================
 # BULK PREDICTION
@@ -560,8 +642,8 @@ elif menu == "Bulk Prediction":
         </div>
 
         <div class="main-desc">
-            Upload CSV datasets and run
-            large-scale IQ category prediction
+            Upload CSV datasets and perform
+            large-scale IQ classification
             using the RapIQ neural engine.
         </div>
 
@@ -581,23 +663,24 @@ elif menu == "Bulk Prediction":
         .encode("utf-8")
     )
 
-    col1, col2 = st.columns([1,2])
+    left, right = st.columns([1,2])
 
-    with col1:
+    with left:
 
-        st.markdown(
-            '<div class="upload-box">',
-            unsafe_allow_html=True
-        )
+        st.markdown("""
+        <div class="glass-card">
 
-        st.markdown("## 📂 Upload Dataset")
+        <div class="section-title">
+            📂 Upload Dataset
+        </div>
 
-        st.markdown(
-            "Drag and drop CSV file for bulk prediction"
-        )
+        <div class="main-desc" style="font-size:15px;">
+            Upload CSV file for bulk IQ prediction.
+        </div>
+        """, unsafe_allow_html=True)
 
         uploaded_file = st.file_uploader(
-            "Upload CSV",
+            "Upload CSV File",
             type=["csv"]
         )
 
@@ -608,40 +691,42 @@ elif menu == "Bulk Prediction":
             mime="text/csv"
         )
 
-        st.markdown(
-            '</div>',
-            unsafe_allow_html=True
-        )
+        st.markdown("</div>", unsafe_allow_html=True)
 
-    with col2:
+    with right:
 
-        st.markdown(
-            '<div class="glass-card">',
-            unsafe_allow_html=True
-        )
+        st.markdown("""
+        <div class="glass-card">
 
-        st.markdown(
-            '<div class="section-title">📄 Dataset Preview</div>',
-            unsafe_allow_html=True
-        )
+        <div class="section-title">
+            📄 Dataset Preview
+        </div>
+        """, unsafe_allow_html=True)
 
         if uploaded_file is not None:
 
-            df = pd.read_csv(uploaded_file)
+            try:
 
-            st.dataframe(
-                df.head(),
-                use_container_width=True
-            )
+                df = pd.read_csv(uploaded_file)
+
+                st.dataframe(
+                    df.head(),
+                    width="stretch"
+                )
+
+            except Exception as e:
+
+                st.error(f"CSV Error: {e}")
 
         else:
 
-            st.info("Upload CSV file first.")
+            st.markdown("""
+            <div class="info-box">
+                Upload CSV file first to preview dataset.
+            </div>
+            """, unsafe_allow_html=True)
 
-        st.markdown(
-            '</div>',
-            unsafe_allow_html=True
-        )
+        st.markdown("</div>", unsafe_allow_html=True)
 
 # =========================================
 # ABOUT
@@ -657,49 +742,52 @@ elif menu == "About":
         </div>
 
         <div class="main-desc">
-            RapIQ is an AI-based web application
-            designed to classify child IQ categories
-            using Multilayer Perceptron (MLP)
-            architecture.
+            RapIQ is an AI-powered cognitive
+            classification system designed
+            for rapid IQ category prediction
+            using Multilayer Perceptron architecture.
         </div>
 
     </div>
     """, unsafe_allow_html=True)
 
-    c1, c2, c3, c4 = st.columns(4)
-
-    metrics = [
-        ("Accuracy", "94.2%"),
-        ("F1-Score", "0.93"),
-        ("Dataset", "80k+"),
-        ("Latency", "12ms")
+    metric_titles = [
+        "Accuracy",
+        "F1-Score",
+        "Dataset",
+        "Latency"
     ]
 
-    cols = [c1, c2, c3, c4]
+    metric_values = [
+        "94.2%",
+        "0.93",
+        "80k+",
+        "12ms"
+    ]
 
-    for col, metric in zip(cols, metrics):
+    cols = st.columns(4)
 
-        with col:
+    for i in range(4):
+
+        with cols[i]:
 
             st.markdown(f"""
             <div class="metric-card">
 
                 <div class="small-label">
-                    {metric[0]}
+                    {metric_titles[i]}
                 </div>
 
                 <div style="
-                    font-size:42px;
+                    font-size:44px;
                     font-weight:800;
                     color:#00D4FF;
                 ">
-                    {metric[1]}
+                    {metric_values[i]}
                 </div>
 
             </div>
             """, unsafe_allow_html=True)
-
-    st.markdown("<br>", unsafe_allow_html=True)
 
     left, right = st.columns([2,1])
 
@@ -714,16 +802,15 @@ elif menu == "About":
 
         <ul style="
             line-height:2;
+            color:#DCE7F3;
             font-size:17px;
         ">
-
-            <li>Algorithm : MLP</li>
+            <li>Algorithm : MLP Classifier</li>
             <li>Hidden Layer : (10, 6)</li>
             <li>Activation : ReLU</li>
             <li>Optimizer : Adam</li>
             <li>Scaling : StandardScaler</li>
             <li>Oversampling : SMOTE</li>
-
         </ul>
 
         </div>
@@ -739,17 +826,17 @@ elif menu == "About":
         </div>
 
         <p style="
-            color:#B7C4D6;
+            color:#C7D5E4;
             line-height:2;
             font-size:16px;
         ">
 
-            RapIQ is developed for
-            educational and research purposes.
+        RapIQ is developed for educational
+        and research purposes only.
 
-            This system is NOT intended
-            to replace professional
-            psychological diagnosis.
+        This system is NOT intended
+        to replace professional
+        psychological diagnosis.
 
         </p>
 
