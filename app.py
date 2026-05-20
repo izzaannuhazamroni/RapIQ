@@ -8,6 +8,7 @@ import pandas as pd
 import numpy as np
 import joblib
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 # =========================================
 # PAGE CONFIG
@@ -23,8 +24,22 @@ st.set_page_config(
 # LOAD MODEL & SCALER
 # =========================================
 
-model = joblib.load("model_mlp_iq.pkl")
-scaler = joblib.load("scaler_iq.pkl")
+@st.cache_resource
+def load_model():
+
+    try:
+
+        model = joblib.load("model_mlp_iq.pkl")
+        scaler = joblib.load("scaler_iq.pkl")
+
+        return model, scaler
+
+    except Exception as e:
+
+        st.error(f"Error loading model/scaler: {e}")
+        st.stop()
+
+model, scaler = load_model()
 
 # =========================================
 # MAPPING
@@ -42,6 +57,18 @@ gender_map = {
     "Female": 0
 }
 
+reverse_edu_map = {
+    "primary or lower secondary": 0,
+    "vocational": 1,
+    "secondary": 2,
+    "higher": 3
+}
+
+reverse_gender_map = {
+    "male": 1,
+    "female": 0
+}
+
 iq_labels = {
     0: "Moderate ID",
     1: "Mild ID",
@@ -51,10 +78,22 @@ iq_labels = {
 }
 
 # =========================================
+# REQUIRED COLUMNS
+# =========================================
+
+required_columns = [
+    "education_mother",
+    "education_father",
+    "age_years",
+    "gender"
+]
+
+# =========================================
 # TITLE
 # =========================================
 
 st.title("🧠 Rapid IQ Classification System")
+
 st.markdown(
     """
     This application predicts child IQ category 
@@ -87,6 +126,7 @@ if menu == "Single Prediction":
     col1, col2 = st.columns(2)
 
     with col1:
+
         education_mother = st.selectbox(
             "Mother Education",
             list(edu_map.keys())
@@ -98,6 +138,7 @@ if menu == "Single Prediction":
         )
 
     with col2:
+
         age = st.number_input(
             "Age",
             min_value=1,
@@ -116,67 +157,79 @@ if menu == "Single Prediction":
 
     if st.button("Predict IQ Category"):
 
-        # Input dataframe
-        input_data = pd.DataFrame({
-            "education_mother": [edu_map[education_mother]],
-            "education_father": [edu_map[education_father]],
-            "age_years": [age],
-            "gender": [gender_map[gender]]
-        })
+        try:
 
-        # Scaling
-        scaled_data = scaler.transform(input_data)
+            # Input dataframe
+            input_data = pd.DataFrame({
+                "education_mother": [edu_map[education_mother]],
+                "education_father": [edu_map[education_father]],
+                "age_years": [age],
+                "gender": [gender_map[gender]]
+            })
 
-        # Prediction
-        prediction = model.predict(scaled_data)[0]
+            # Scaling
+            scaled_data = scaler.transform(input_data)
 
-        # Probability
-        probabilities = model.predict_proba(scaled_data)[0]
+            # Prediction
+            prediction = model.predict(scaled_data)[0]
 
-        confidence = np.max(probabilities) * 100
+            # Probability
+            probabilities = model.predict_proba(scaled_data)[0]
 
-        predicted_label = iq_labels[prediction]
+            confidence = np.max(probabilities) * 100
 
-        # =========================================
-        # RESULT
-        # =========================================
+            predicted_label = iq_labels[prediction]
 
-        st.success(f"Predicted IQ Category: {predicted_label}")
+            # =========================================
+            # RESULT
+            # =========================================
 
-        st.info(f"Confidence Score: {confidence:.2f}%")
-
-        # =========================================
-        # PROBABILITY CHART
-        # =========================================
-
-        st.subheader("📊 Prediction Probability")
-
-        prob_df = pd.DataFrame({
-            "Category": list(iq_labels.values()),
-            "Probability": probabilities * 100
-        })
-
-        fig, ax = plt.subplots(figsize=(8, 4))
-
-        bars = ax.bar(
-            prob_df["Category"],
-            prob_df["Probability"]
-        )
-
-        # Add labels
-        for bar in bars:
-            height = bar.get_height()
-            ax.text(
-                bar.get_x() + bar.get_width()/2,
-                height + 1,
-                f"{height:.1f}%",
-                ha='center'
+            st.success(
+                f"Predicted IQ Category: {predicted_label}"
             )
 
-        ax.set_ylabel("Probability (%)")
-        ax.set_ylim(0, 100)
+            st.info(
+                f"Confidence Score: {confidence:.2f}%"
+            )
 
-        st.pyplot(fig)
+            # =========================================
+            # PROBABILITY CHART
+            # =========================================
+
+            st.subheader("📊 Prediction Probability")
+
+            prob_df = pd.DataFrame({
+                "Category": list(iq_labels.values()),
+                "Probability": probabilities * 100
+            })
+
+            fig, ax = plt.subplots(figsize=(8, 4))
+
+            bars = ax.bar(
+                prob_df["Category"],
+                prob_df["Probability"]
+            )
+
+            # Add labels
+            for bar in bars:
+
+                height = bar.get_height()
+
+                ax.text(
+                    bar.get_x() + bar.get_width()/2,
+                    height + 1,
+                    f"{height:.1f}%",
+                    ha='center'
+                )
+
+            ax.set_ylabel("Probability (%)")
+            ax.set_ylim(0, 100)
+
+            st.pyplot(fig)
+
+        except Exception as e:
+
+            st.error(f"Prediction Error: {e}")
 
 # =========================================
 # BULK PREDICTION
@@ -194,6 +247,51 @@ elif menu == "Bulk Prediction (CSV)":
     - gender
     """)
 
+    # =========================================
+    # TEMPLATE CSV
+    # =========================================
+
+    template_df = pd.DataFrame({
+
+        "education_mother": [
+            "secondary",
+            "higher"
+        ],
+
+        "education_father": [
+            "vocational",
+            "higher"
+        ],
+
+        "age_years": [
+            10,
+            15
+        ],
+
+        "gender": [
+            "male",
+            "female"
+        ]
+
+    })
+
+    template_csv = (
+        template_df
+        .to_csv(index=False)
+        .encode("utf-8")
+    )
+
+    st.download_button(
+        label="⬇ Download CSV Template",
+        data=template_csv,
+        file_name="template_input_iq.csv",
+        mime="text/csv"
+    )
+
+    # =========================================
+    # FILE UPLOADER
+    # =========================================
+
     uploaded_file = st.file_uploader(
         "Upload CSV File",
         type=["csv"]
@@ -201,147 +299,339 @@ elif menu == "Bulk Prediction (CSV)":
 
     if uploaded_file is not None:
 
-        df = pd.read_csv(uploaded_file)
+        try:
 
-        st.subheader("📄 Dataset Preview")
-        st.dataframe(df.head())
+            # =========================================
+            # READ CSV
+            # =========================================
 
-        # =========================================
-        # ENCODING
-        # =========================================
+            df = pd.read_csv(uploaded_file)
 
-        df_encoded = df.copy()
+            st.subheader("📄 Dataset Preview")
+            st.dataframe(df.head())
 
-        # Education encoding
-        reverse_edu_map = {
-            "primary or lower secondary": 0,
-            "vocational": 1,
-            "secondary": 2,
-            "higher": 3
-        }
+            # =========================================
+            # VALIDASI KOLOM
+            # =========================================
 
-        reverse_gender_map = {
-            "male": 1,
-            "female": 0
-        }
+            missing_cols = [
+                col for col in required_columns
+                if col not in df.columns
+            ]
 
-        df_encoded["education_mother"] = (
-            df_encoded["education_mother"]
-            .str.lower()
-            .map(reverse_edu_map)
-        )
+            if len(missing_cols) > 0:
 
-        df_encoded["education_father"] = (
-            df_encoded["education_father"]
-            .str.lower()
-            .map(reverse_edu_map)
-        )
+                st.error(
+                    f"""
+Missing columns:
 
-        df_encoded["gender"] = (
-            df_encoded["gender"]
-            .str.lower()
-            .map(reverse_gender_map)
-        )
+{missing_cols}
 
-        # =========================================
-        # FEATURE SELECTION
-        # =========================================
+Required columns:
+- education_mother
+- education_father
+- age_years
+- gender
+                    """
+                )
 
-        X = df_encoded[[
-            "education_mother",
-            "education_father",
-            "age_years",
-            "gender"
-        ]]
+                st.stop()
 
-        # Scaling
-        X_scaled = scaler.transform(X)
+            # =========================================
+            # PREPROCESSING
+            # =========================================
 
-        # Prediction
-        predictions = model.predict(X_scaled)
+            df_encoded = df.copy()
 
-        # Probability
-        probabilities = model.predict_proba(X_scaled)
-
-        confidence_scores = np.max(probabilities, axis=1) * 100
-
-        # Label mapping
-        predicted_labels = [
-            iq_labels[p] for p in predictions
-        ]
-
-        # =========================================
-        # OUTPUT
-        # =========================================
-
-        result_df = df.copy()
-
-        result_df["predicted_iq_category"] = predicted_labels
-        result_df["confidence_score (%)"] = confidence_scores.round(2)
-
-        # =========================================
-        # DISPLAY RESULT
-        # =========================================
-
-        st.subheader("✅ Prediction Results")
-
-        display_columns = [
-            "education_mother",
-            "education_father",
-            "age_years",
-            "gender",
-            "predicted_iq_category",
-            "confidence_score (%)"
-        ]
-
-        st.dataframe(result_df[display_columns])
-
-        # =========================================
-        # DISTRIBUTION CHART
-        # =========================================
-
-        st.subheader("📈 Prediction Distribution")
-
-        category_counts = (
-            result_df["predicted_iq_category"]
-            .value_counts()
-        )
-
-        fig2, ax2 = plt.subplots(figsize=(8, 5))
-
-        bars = ax2.bar(
-            category_counts.index,
-            category_counts.values
-        )
-
-        # Add labels above bars
-        for bar in bars:
-            height = bar.get_height()
-
-            ax2.text(
-                bar.get_x() + bar.get_width()/2,
-                height + 0.2,
-                str(height),
-                ha='center'
+            # Ubah string kosong jadi NaN
+            df_encoded = df_encoded.replace(
+                r'^\s*$',
+                np.nan,
+                regex=True
             )
 
-        ax2.set_ylabel("Number of Data")
-        ax2.set_xlabel("IQ Category")
+            # Hapus missing value
+            jumlah_sebelum = len(df_encoded)
 
-        st.pyplot(fig2)
+            df_encoded = df_encoded.dropna(
+                subset=required_columns
+            )
 
-        # =========================================
-        # DOWNLOAD
-        # =========================================
+            jumlah_sesudah = len(df_encoded)
 
-        csv = result_df.to_csv(index=False).encode("utf-8")
+            jumlah_terhapus = (
+                jumlah_sebelum - jumlah_sesudah
+            )
 
-        st.download_button(
-            label="⬇ Download Prediction Result",
-            data=csv,
-            file_name="prediction_result.csv",
-            mime="text/csv"
-        )
+            if len(df_encoded) == 0:
+
+                st.error(
+                    "Semua data terhapus karena missing value."
+                )
+
+                st.stop()
+
+            # =========================================
+            # CLEANING STRING
+            # =========================================
+
+            df_encoded["education_mother"] = (
+                df_encoded["education_mother"]
+                .astype(str)
+                .str.strip()
+                .str.lower()
+                .str.replace(r"\s+", " ", regex=True)
+            )
+
+            df_encoded["education_father"] = (
+                df_encoded["education_father"]
+                .astype(str)
+                .str.strip()
+                .str.lower()
+                .str.replace(r"\s+", " ", regex=True)
+            )
+
+            df_encoded["gender"] = (
+                df_encoded["gender"]
+                .astype(str)
+                .str.strip()
+                .str.lower()
+            )
+
+            # =========================================
+            # AGE CONVERSION
+            # =========================================
+
+            df_encoded["age_years"] = pd.to_numeric(
+                df_encoded["age_years"],
+                errors="coerce"
+            )
+
+            # =========================================
+            # ENCODING
+            # =========================================
+
+            df_encoded["education_mother"] = (
+                df_encoded["education_mother"]
+                .map(reverse_edu_map)
+            )
+
+            df_encoded["education_father"] = (
+                df_encoded["education_father"]
+                .map(reverse_edu_map)
+            )
+
+            df_encoded["gender"] = (
+                df_encoded["gender"]
+                .map(reverse_gender_map)
+            )
+
+            # =========================================
+            # VALIDASI KATEGORI
+            # =========================================
+
+            if df_encoded.isnull().sum().sum() > 0:
+
+                st.error("""
+Terdapat kategori yang tidak valid.
+
+Gunakan format berikut:
+
+Education:
+- primary or lower secondary
+- vocational
+- secondary
+- higher
+
+Gender:
+- male
+- female
+                """)
+
+                st.stop()
+
+            # =========================================
+            # FEATURE SELECTION
+            # =========================================
+
+            X = df_encoded[[
+                "education_mother",
+                "education_father",
+                "age_years",
+                "gender"
+            ]]
+
+            # =========================================
+            # SCALING
+            # =========================================
+
+            X_scaled = scaler.transform(X)
+
+            # =========================================
+            # PREDICTION
+            # =========================================
+
+            predictions = model.predict(X_scaled)
+
+            # =========================================
+            # PROBABILITY
+            # =========================================
+
+            probabilities = model.predict_proba(X_scaled)
+
+            confidence_scores = (
+                np.max(probabilities, axis=1) * 100
+            )
+
+            # =========================================
+            # LABEL MAPPING
+            # =========================================
+
+            predicted_labels = [
+                iq_labels[p]
+                for p in predictions
+            ]
+
+            # =========================================
+            # OUTPUT
+            # =========================================
+
+            result_df = pd.DataFrame({
+
+                "education_mother":
+                    df.loc[
+                        df_encoded.index,
+                        "education_mother"
+                    ],
+
+                "education_father":
+                    df.loc[
+                        df_encoded.index,
+                        "education_father"
+                    ],
+
+                "age_years":
+                    df.loc[
+                        df_encoded.index,
+                        "age_years"
+                    ],
+
+                "gender":
+                    df.loc[
+                        df_encoded.index,
+                        "gender"
+                    ],
+
+                "predicted_iq_category":
+                    predicted_labels,
+
+                "confidence_score (%)": [
+                    f"{x:.2f}%"
+                    for x in confidence_scores
+                ]
+
+            })
+
+            # =========================================
+            # STATUS
+            # =========================================
+
+            st.success(
+                "Prediction completed successfully."
+            )
+
+            st.info(
+                f"""
+Jumlah data diproses: {len(result_df)}
+
+Baris dihapus: {jumlah_terhapus}
+                """
+            )
+
+            # =========================================
+            # DISPLAY RESULT
+            # =========================================
+
+            st.subheader("✅ Prediction Results")
+
+            display_columns = [
+                "education_mother",
+                "education_father",
+                "age_years",
+                "gender",
+                "predicted_iq_category",
+                "confidence_score (%)"
+            ]
+
+            st.dataframe(
+                result_df[display_columns],
+                use_container_width=True
+            )
+
+            # =========================================
+            # DISTRIBUTION CHART
+            # =========================================
+
+            st.subheader("📈 Prediction Distribution")
+
+            fig2, ax2 = plt.subplots(
+                figsize=(10, 5)
+            )
+
+            sns.countplot(
+                x=result_df[
+                    "predicted_iq_category"
+                ],
+                palette="viridis",
+                ax=ax2
+            )
+
+            # Add labels above bars
+            for p in ax2.patches:
+
+                jumlah = int(p.get_height())
+
+                ax2.annotate(
+                    str(jumlah),
+
+                    (
+                        p.get_x() + p.get_width()/2,
+                        p.get_height()
+                    ),
+
+                    ha='center',
+                    va='bottom',
+                    fontsize=11,
+                    fontweight='bold'
+                )
+
+            ax2.set_ylabel("Number of Data")
+            ax2.set_xlabel("IQ Category")
+
+            plt.xticks(rotation=10)
+
+            st.pyplot(fig2)
+
+            # =========================================
+            # DOWNLOAD
+            # =========================================
+
+            csv = (
+                result_df
+                .to_csv(index=False)
+                .encode("utf-8")
+            )
+
+            st.download_button(
+                label="⬇ Download Prediction Result",
+                data=csv,
+                file_name="prediction_result.csv",
+                mime="text/csv"
+            )
+
+        except Exception as e:
+
+            st.error(f"ERROR:\n\n{str(e)}")
 
 # =========================================
 # ABOUT MODEL
@@ -377,4 +667,18 @@ elif menu == "About Model":
     - Above Average
     """)
 
-    st.info("Model trained using Stanford-Binet Intelligence Scales dataset.")
+    st.info(
+        "Model trained using Stanford-Binet Intelligence Scales dataset."
+    )
+
+    st.warning(
+        """
+Disclaimer:
+
+Model dibuat menggunakan dataset penelitian terbatas
+dan tidak dapat digunakan sebagai alat diagnosis klinis.
+
+Confidence score merupakan probabilitas model,
+bukan probabilitas klinis nyata.
+        """
+    )
