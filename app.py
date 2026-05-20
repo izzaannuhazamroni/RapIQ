@@ -305,7 +305,12 @@ elif menu == "Bulk Prediction (CSV)":
             # READ CSV
             # =========================================
 
-            df = pd.read_csv(uploaded_file)
+            df = pd.read_csv(
+                uploaded_file,
+                sep=None,
+                engine="python",
+                decimal=","
+            )
 
             st.subheader("📄 Dataset Preview")
             st.dataframe(df.head())
