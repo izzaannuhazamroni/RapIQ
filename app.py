@@ -1,7 +1,7 @@
 # =========================================
 # RapIQ STREAMLIT APP
 # Premium Futuristic UI
-# FIXED VERSION
+# FINAL STABLE VERSION
 # =========================================
 
 import streamlit as st
@@ -30,21 +30,32 @@ st.markdown("""
 
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
-html, body, [class*="css"] {
+html, body, .stApp {
     font-family: 'Plus Jakarta Sans', sans-serif;
-}
-
-.stApp {
     background: #050816;
     color: white;
 }
 
-/* REMOVE STREAMLIT PADDING */
+/* HIDE STREAMLIT DEFAULT */
+
+#MainMenu {
+    visibility: hidden;
+}
+
+footer {
+    visibility: hidden;
+}
+
+header {
+    visibility: hidden;
+}
+
+/* MAIN CONTAINER */
 
 .block-container {
     padding-top: 2rem;
     padding-bottom: 2rem;
-    max-width: 1500px;
+    max-width: 1450px;
 }
 
 /* SIDEBAR */
@@ -73,19 +84,13 @@ section[data-testid="stSidebar"] {
     margin-bottom: 30px;
 }
 
-/* HIDE STREAMLIT RADIO TITLE */
-
-div[role="radiogroup"] label {
-    color: white !important;
-}
-
-/* HERO */
+/* HERO CARD */
 
 .hero-card {
     background:
         linear-gradient(
             135deg,
-            rgba(15,20,35,0.95),
+            rgba(15,20,35,0.96),
             rgba(8,12,25,0.92)
         );
 
@@ -103,10 +108,11 @@ div[role="radiogroup"] label {
         0 0 45px rgba(0,212,255,0.06);
 }
 
-/* GLASS CARD */
+/* GLASS CONTAINER */
 
 .glass-card {
-    background: rgba(18,22,38,0.70);
+
+    background: rgba(18,22,38,0.72);
 
     border: 1px solid rgba(0,212,255,0.10);
 
@@ -138,7 +144,7 @@ div[role="radiogroup"] label {
 
     padding: 30px;
 
-    height: 100%;
+    min-height: 100%;
 
     box-shadow:
         0 0 35px rgba(0,212,255,0.15);
@@ -147,7 +153,8 @@ div[role="radiogroup"] label {
 /* METRIC CARD */
 
 .metric-card {
-    background: rgba(18,22,38,0.70);
+
+    background: rgba(18,22,38,0.72);
 
     border: 1px solid rgba(0,212,255,0.10);
 
@@ -187,7 +194,7 @@ div[role="radiogroup"] label {
 
     line-height: 1.8;
 
-    max-width: 700px;
+    max-width: 720px;
 }
 
 .section-title {
@@ -280,7 +287,9 @@ div.stButton > button:hover {
 
 .stSelectbox label,
 .stNumberInput label {
+
     color: #DCE7F3 !important;
+
     font-weight: 600 !important;
 }
 
@@ -364,7 +373,7 @@ def load_model():
 
     except Exception as e:
 
-        st.error(f"Model loading error: {e}")
+        st.error(f"Error loading model: {e}")
         st.stop()
 
 model, scaler = load_model()
@@ -417,7 +426,9 @@ required_columns = [
 # =========================================
 
 st.sidebar.markdown("""
-<div class="sidebar-title">RapIQ</div>
+<div class="sidebar-title">
+RapIQ
+</div>
 
 <div class="sidebar-sub">
 MLP ARCHITECTURE : (10,6)
@@ -591,7 +602,7 @@ if menu == "Single Prediction":
 
                 st.plotly_chart(
                     fig,
-                    width='stretch'
+                    use_container_width=True
                 )
 
                 st.markdown("</div>", unsafe_allow_html=True)
@@ -711,8 +722,113 @@ elif menu == "Bulk Prediction":
 
                 st.dataframe(
                     df.head(),
-                    width="stretch"
+                    use_container_width=True
                 )
+
+                missing_cols = [
+                    col for col in required_columns
+                    if col not in df.columns
+                ]
+
+                if len(missing_cols) > 0:
+
+                    st.error(
+                        f"Missing columns: {missing_cols}"
+                    )
+
+                else:
+
+                    df_encoded = df.copy()
+
+                    df_encoded["education_mother"] = (
+                        df_encoded["education_mother"]
+                        .astype(str)
+                        .str.strip()
+                        .str.lower()
+                    )
+
+                    df_encoded["education_father"] = (
+                        df_encoded["education_father"]
+                        .astype(str)
+                        .str.strip()
+                        .str.lower()
+                    )
+
+                    df_encoded["gender"] = (
+                        df_encoded["gender"]
+                        .astype(str)
+                        .str.strip()
+                        .str.lower()
+                    )
+
+                    df_encoded["education_mother"] = (
+                        df_encoded["education_mother"]
+                        .map(reverse_edu_map)
+                    )
+
+                    df_encoded["education_father"] = (
+                        df_encoded["education_father"]
+                        .map(reverse_edu_map)
+                    )
+
+                    df_encoded["gender"] = (
+                        df_encoded["gender"]
+                        .map(reverse_gender_map)
+                    )
+
+                    X = df_encoded[
+                        required_columns
+                    ]
+
+                    X_scaled = scaler.transform(X)
+
+                    predictions = model.predict(X_scaled)
+
+                    probabilities = (
+                        model.predict_proba(X_scaled)
+                    )
+
+                    confidence_scores = (
+                        np.max(probabilities, axis=1) * 100
+                    )
+
+                    result_df = df.copy()
+
+                    result_df[
+                        "predicted_iq_category"
+                    ] = [
+                        iq_labels[p]
+                        for p in predictions
+                    ]
+
+                    result_df[
+                        "confidence_score (%)"
+                    ] = [
+                        f"{x:.2f}%"
+                        for x in confidence_scores
+                    ]
+
+                    st.success(
+                        "Prediction completed successfully."
+                    )
+
+                    st.dataframe(
+                        result_df,
+                        use_container_width=True
+                    )
+
+                    csv = (
+                        result_df
+                        .to_csv(index=False)
+                        .encode("utf-8")
+                    )
+
+                    st.download_button(
+                        label="⬇ Download Prediction Result",
+                        data=csv,
+                        file_name="prediction_result.csv",
+                        mime="text/csv"
+                    )
 
             except Exception as e:
 
@@ -788,6 +904,8 @@ elif menu == "About":
 
             </div>
             """, unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
 
     left, right = st.columns([2,1])
 
