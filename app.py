@@ -1,364 +1,26 @@
 # =========================================
-# RapIQ STREAMLIT APP
-# Premium Futuristic UI
-# FINAL STABLE VERSION
+# STREAMLIT APP
+# IQ Classification using MLP
 # =========================================
 
 import streamlit as st
 import pandas as pd
 import numpy as np
 import joblib
-import plotly.graph_objects as go
+import matplotlib.pyplot as plt
 
 # =========================================
 # PAGE CONFIG
 # =========================================
 
 st.set_page_config(
-    page_title="RapIQ",
+    page_title="Rapid IQ Classification",
     page_icon="🧠",
-    layout="wide",
-    initial_sidebar_state="expanded"
+    layout="wide"
 )
 
 # =========================================
-# CUSTOM CSS
-# =========================================
-
-st.markdown("""
-<style>
-
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
-
-html, body, .stApp {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    background: #050816;
-    color: white;
-}
-
-/* HIDE STREAMLIT DEFAULT */
-
-#MainMenu {
-    visibility: hidden;
-}
-
-footer {
-    visibility: hidden;
-}
-
-header {
-    visibility: hidden;
-}
-
-/* MAIN CONTAINER */
-
-.block-container {
-    padding-top: 2rem;
-    padding-bottom: 2rem;
-    max-width: 1450px;
-}
-
-/* SIDEBAR */
-
-section[data-testid="stSidebar"] {
-    background: linear-gradient(
-        180deg,
-        #07111F,
-        #040A14
-    );
-    border-right: 1px solid rgba(0,212,255,0.12);
-}
-
-.sidebar-title {
-    font-size: 34px;
-    font-weight: 800;
-    color: white;
-    margin-bottom: 0px;
-}
-
-.sidebar-sub {
-    color: #00D4FF;
-    font-size: 11px;
-    letter-spacing: 1px;
-    margin-top: -5px;
-    margin-bottom: 30px;
-}
-
-/* HERO CARD */
-
-.hero-card {
-    background:
-        linear-gradient(
-            135deg,
-            rgba(15,20,35,0.96),
-            rgba(8,12,25,0.92)
-        );
-
-    border: 1px solid rgba(0,212,255,0.12);
-
-    border-radius: 28px;
-
-    padding: 45px;
-
-    margin-bottom: 28px;
-
-    backdrop-filter: blur(18px);
-
-    box-shadow:
-        0 0 45px rgba(0,212,255,0.06);
-}
-
-/* GLASS CONTAINER */
-
-.glass-card {
-
-    background: rgba(18,22,38,0.72);
-
-    border: 1px solid rgba(0,212,255,0.10);
-
-    border-radius: 24px;
-
-    padding: 28px;
-
-    backdrop-filter: blur(20px);
-
-    box-shadow:
-        0 0 25px rgba(0,212,255,0.05);
-
-    margin-bottom: 25px;
-}
-
-/* RESULT CARD */
-
-.result-card {
-
-    background: linear-gradient(
-        135deg,
-        rgba(0,212,255,0.18),
-        rgba(87,27,193,0.20)
-    );
-
-    border: 1px solid rgba(255,255,255,0.08);
-
-    border-radius: 24px;
-
-    padding: 30px;
-
-    min-height: 100%;
-
-    box-shadow:
-        0 0 35px rgba(0,212,255,0.15);
-}
-
-/* METRIC CARD */
-
-.metric-card {
-
-    background: rgba(18,22,38,0.72);
-
-    border: 1px solid rgba(0,212,255,0.10);
-
-    border-radius: 22px;
-
-    padding: 30px;
-
-    text-align: center;
-
-    height: 180px;
-
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-/* TITLES */
-
-.main-title {
-
-    font-size: 64px;
-
-    font-weight: 800;
-
-    color: white;
-
-    margin-bottom: 15px;
-
-    line-height: 1;
-}
-
-.main-desc {
-
-    color: #B7C4D6;
-
-    font-size: 18px;
-
-    line-height: 1.8;
-
-    max-width: 720px;
-}
-
-.section-title {
-
-    color: white;
-
-    font-size: 24px;
-
-    font-weight: 700;
-
-    margin-bottom: 22px;
-}
-
-.small-label {
-
-    color: #8FA5C0;
-
-    font-size: 12px;
-
-    letter-spacing: 1px;
-
-    font-weight: 600;
-
-    margin-bottom: 8px;
-}
-
-.prediction-label {
-
-    color: #00D4FF;
-
-    font-size: 42px;
-
-    font-weight: 800;
-
-    line-height: 1.1;
-
-    margin-bottom: 20px;
-}
-
-.confidence-label {
-
-    color: #D0BCFF;
-
-    font-size: 16px;
-
-    margin-bottom: 10px;
-
-    font-weight: 600;
-}
-
-/* BUTTON */
-
-div.stButton > button {
-
-    width: 100%;
-
-    height: 65px;
-
-    border-radius: 999px;
-
-    border: none;
-
-    background: linear-gradient(
-        90deg,
-        #00D4FF,
-        #571BC1
-    );
-
-    color: white;
-
-    font-size: 18px;
-
-    font-weight: 700;
-
-    box-shadow:
-        0 0 35px rgba(0,212,255,0.30);
-
-    transition: 0.3s ease;
-}
-
-div.stButton > button:hover {
-
-    transform: scale(1.02);
-
-    box-shadow:
-        0 0 50px rgba(0,212,255,0.50);
-}
-
-/* INPUTS */
-
-.stSelectbox label,
-.stNumberInput label {
-
-    color: #DCE7F3 !important;
-
-    font-weight: 600 !important;
-}
-
-div[data-baseweb="select"] > div {
-
-    background-color: rgba(10,15,25,0.95) !important;
-
-    border: 1px solid rgba(0,212,255,0.15) !important;
-
-    border-radius: 14px !important;
-}
-
-.stNumberInput input {
-
-    background-color: rgba(10,15,25,0.95) !important;
-
-    color: white !important;
-
-    border-radius: 14px !important;
-
-    border: 1px solid rgba(0,212,255,0.15) !important;
-}
-
-/* DATAFRAME */
-
-[data-testid="stDataFrame"] {
-
-    border-radius: 20px;
-
-    overflow: hidden;
-
-    border: 1px solid rgba(0,212,255,0.08);
-}
-
-/* FILE UPLOADER */
-
-[data-testid="stFileUploader"] {
-
-    background: rgba(15,20,35,0.7);
-
-    border: 2px dashed rgba(0,212,255,0.20);
-
-    border-radius: 20px;
-
-    padding: 20px;
-}
-
-/* INFO BOX */
-
-.info-box {
-
-    background: rgba(0,212,255,0.08);
-
-    border-left: 4px solid #00D4FF;
-
-    padding: 16px;
-
-    border-radius: 14px;
-
-    color: #D7E6F5;
-
-    line-height: 1.7;
-}
-
-</style>
-""", unsafe_allow_html=True)
-
-# =========================================
-# LOAD MODEL
+# LOAD MODEL & SCALER
 # =========================================
 
 @st.cache_resource
@@ -373,7 +35,7 @@ def load_model():
 
     except Exception as e:
 
-        st.error(f"Error loading model: {e}")
+        st.error(f"Error loading model/scaler: {e}")
         st.stop()
 
 model, scaler = load_model()
@@ -389,16 +51,16 @@ edu_map = {
     "Higher": 3
 }
 
+gender_map = {
+    "Male": 1,
+    "Female": 0
+}
+
 reverse_edu_map = {
     "primary or lower secondary": 0,
     "vocational": 1,
     "secondary": 2,
     "higher": 3
-}
-
-gender_map = {
-    "Male": 1,
-    "Female": 0
 }
 
 reverse_gender_map = {
@@ -414,6 +76,10 @@ iq_labels = {
     4: "Above Average"
 }
 
+# =========================================
+# REQUIRED COLUMNS
+# =========================================
+
 required_columns = [
     "education_mother",
     "education_father",
@@ -422,25 +88,29 @@ required_columns = [
 ]
 
 # =========================================
+# TITLE
+# =========================================
+
+st.title("🧠 Rapid IQ Classification System")
+
+st.markdown(
+    """
+    This application predicts child IQ category 
+    based on parental education, age, and gender 
+    using a Multilayer Perceptron (MLP) model.
+    """
+)
+
+# =========================================
 # SIDEBAR
 # =========================================
 
-st.sidebar.markdown("""
-<div class="sidebar-title">
-RapIQ
-</div>
-
-<div class="sidebar-sub">
-MLP ARCHITECTURE : (10,6)
-</div>
-""", unsafe_allow_html=True)
-
-menu = st.sidebar.radio(
-    "Navigation",
+menu = st.sidebar.selectbox(
+    "Select Menu",
     [
         "Single Prediction",
-        "Bulk Prediction",
-        "About"
+        "Bulk Prediction (CSV)",
+        "About Model"
     ]
 )
 
@@ -450,59 +120,26 @@ menu = st.sidebar.radio(
 
 if menu == "Single Prediction":
 
-    st.markdown("""
-    <div class="hero-card">
-
-        <div class="main-title">
-            RapIQ
-        </div>
-
-        <div class="main-desc">
-            Cognitive intelligence classification system
-            powered by Multilayer Perceptron (MLP)
-            architecture for rapid IQ category prediction
-            based on socio-demographic indicators.
-        </div>
-
-    </div>
-    """, unsafe_allow_html=True)
+    st.subheader("📌 Single Prediction")
 
     col1, col2 = st.columns(2)
 
     with col1:
 
-        st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-
-        st.markdown("""
-        <div class="section-title">
-            👨‍👩‍👧 Family Information
-        </div>
-        """, unsafe_allow_html=True)
-
         education_mother = st.selectbox(
-            "Mother Education Level",
+            "Mother Education",
             list(edu_map.keys())
         )
 
         education_father = st.selectbox(
-            "Father Education Level",
+            "Father Education",
             list(edu_map.keys())
         )
 
-        st.markdown('</div>', unsafe_allow_html=True)
-
     with col2:
 
-        st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-
-        st.markdown("""
-        <div class="section-title">
-            🧒 Child Information
-        </div>
-        """, unsafe_allow_html=True)
-
         age = st.number_input(
-            "Age (Years)",
+            "Age",
             min_value=1,
             max_value=18,
             value=10
@@ -513,20 +150,15 @@ if menu == "Single Prediction":
             list(gender_map.keys())
         )
 
-        st.markdown('</div>', unsafe_allow_html=True)
+    # =========================================
+    # PREDICT BUTTON
+    # =========================================
 
-    btn1, btn2, btn3 = st.columns([1,2,1])
-
-    with btn2:
-
-        predict_btn = st.button(
-            "🚀 Predict IQ Category"
-        )
-
-    if predict_btn:
+    if st.button("Predict IQ Category"):
 
         try:
 
+            # Input dataframe
             input_data = pd.DataFrame({
                 "education_mother": [edu_map[education_mother]],
                 "education_father": [edu_map[education_father]],
@@ -534,106 +166,65 @@ if menu == "Single Prediction":
                 "gender": [gender_map[gender]]
             })
 
+            # Scaling
             scaled_data = scaler.transform(input_data)
 
+            # Prediction
             prediction = model.predict(scaled_data)[0]
 
+            # Probability
             probabilities = model.predict_proba(scaled_data)[0]
 
             confidence = np.max(probabilities) * 100
 
             predicted_label = iq_labels[prediction]
 
+            # =========================================
+            # RESULT
+            # =========================================
+
+            st.success(
+                f"Predicted IQ Category: {predicted_label}"
+            )
+
+            st.info(
+                f"Confidence Score: {confidence:.2f}%"
+            )
+
+            # =========================================
+            # PROBABILITY CHART
+            # =========================================
+
+            st.subheader("📊 Prediction Probability")
+
             prob_df = pd.DataFrame({
                 "Category": list(iq_labels.values()),
                 "Probability": probabilities * 100
             })
 
-            colors = ["#1E293B"] * len(prob_df)
+            fig, ax = plt.subplots(figsize=(8, 4))
 
-            colors[
-                prob_df["Probability"].idxmax()
-            ] = "#00D4FF"
-
-            fig = go.Figure()
-
-            fig.add_trace(
-                go.Bar(
-                    x=prob_df["Category"],
-                    y=prob_df["Probability"],
-                    marker_color=colors,
-                    text=[
-                        f"{x:.1f}%"
-                        for x in prob_df["Probability"]
-                    ],
-                    textposition="outside"
-                )
+            bars = ax.bar(
+                prob_df["Category"],
+                prob_df["Probability"]
             )
 
-            fig.update_layout(
-                template="plotly_dark",
-                height=430,
-                paper_bgcolor='rgba(0,0,0,0)',
-                plot_bgcolor='rgba(0,0,0,0)',
-                font=dict(
-                    color="white",
-                    family="Plus Jakarta Sans"
-                ),
-                yaxis=dict(
-                    range=[0,100],
-                    gridcolor="rgba(255,255,255,0.08)"
-                ),
-                xaxis=dict(
-                    showgrid=False
-                )
-            )
+            # Add labels
+            for bar in bars:
 
-            chart_col, result_col = st.columns([2,1])
+                height = bar.get_height()
 
-            with chart_col:
-
-                st.markdown("""
-                <div class="glass-card">
-
-                <div class="section-title">
-                    📊 Confidence Probability
-                </div>
-                """, unsafe_allow_html=True)
-
-                st.plotly_chart(
-                    fig,
-                    use_container_width=True
+                ax.text(
+                    bar.get_x() + bar.get_width()/2,
+                    height + 1,
+                    f"{height:.1f}%",
+                    ha='center'
                 )
 
-                st.markdown("</div>", unsafe_allow_html=True)
+            ax.set_ylabel("Probability (%)")
+            ax.set_ylim(0, 100)
 
-            with result_col:
-
-                st.markdown(f"""
-                <div class="result-card">
-
-                    <div class="small-label">
-                        FINAL PREDICTION
-                    </div>
-
-                    <div class="prediction-label">
-                        {predicted_label}
-                    </div>
-
-                    <div class="confidence-label">
-                        Confidence Score
-                    </div>
-
-                    <div style="
-                        font-size:48px;
-                        font-weight:800;
-                        color:white;
-                    ">
-                        {confidence:.2f}%
-                    </div>
-
-                </div>
-                """, unsafe_allow_html=True)
+            st.pyplot(fig)
 
         except Exception as e:
 
@@ -643,29 +234,44 @@ if menu == "Single Prediction":
 # BULK PREDICTION
 # =========================================
 
-elif menu == "Bulk Prediction":
+elif menu == "Bulk Prediction (CSV)":
+
+    st.subheader("📂 Bulk Prediction Using CSV")
 
     st.markdown("""
-    <div class="hero-card">
+    ### Required CSV Columns:
+    - education_mother
+    - education_father
+    - age_years
+    - gender
+    """)
 
-        <div class="main-title">
-            Bulk Prediction
-        </div>
-
-        <div class="main-desc">
-            Upload CSV datasets and perform
-            large-scale IQ classification
-            using the RapIQ neural engine.
-        </div>
-
-    </div>
-    """, unsafe_allow_html=True)
+    # =========================================
+    # TEMPLATE CSV
+    # =========================================
 
     template_df = pd.DataFrame({
-        "education_mother": ["secondary"],
-        "education_father": ["higher"],
-        "age_years": [10],
-        "gender": ["male"]
+
+        "education_mother": [
+            "secondary",
+            "higher"
+        ],
+
+        "education_father": [
+            "vocational",
+            "higher"
+        ],
+
+        "age_years": [
+            10,
+            15
+        ],
+
+        "gender": [
+            "male",
+            "female"
+        ]
+
     })
 
     template_csv = (
@@ -674,289 +280,446 @@ elif menu == "Bulk Prediction":
         .encode("utf-8")
     )
 
-    left, right = st.columns([1,2])
+    st.download_button(
+        label="⬇ Download CSV Template",
+        data=template_csv,
+        file_name="template_input_iq.csv",
+        mime="text/csv"
+    )
 
-    with left:
+    # =========================================
+    # FILE UPLOADER
+    # =========================================
 
-        st.markdown("""
-        <div class="glass-card">
+    uploaded_file = st.file_uploader(
+        "Upload CSV File",
+        type=["csv"]
+    )
 
-        <div class="section-title">
-            📂 Upload Dataset
-        </div>
+    if uploaded_file is not None:
 
-        <div class="main-desc" style="font-size:15px;">
-            Upload CSV file for bulk IQ prediction.
-        </div>
-        """, unsafe_allow_html=True)
+        try:
 
-        uploaded_file = st.file_uploader(
-            "Upload CSV File",
-            type=["csv"]
-        )
+            # =========================================
+            # READ CSV
+            # =========================================
 
-        st.download_button(
-            label="⬇ Download CSV Template",
-            data=template_csv,
-            file_name="template_input_iq.csv",
-            mime="text/csv"
-        )
+            df = pd.read_csv(
+                uploaded_file,
+                sep=None,
+                engine="python",
+                decimal=","
+            )
 
-        st.markdown("</div>", unsafe_allow_html=True)
+            st.subheader("📄 Dataset Preview")
+            st.dataframe(df.head())
 
-    with right:
+            # =========================================
+            # VALIDASI KOLOM
+            # =========================================
 
-        st.markdown("""
-        <div class="glass-card">
+            missing_cols = [
+                col for col in required_columns
+                if col not in df.columns
+            ]
 
-        <div class="section-title">
-            📄 Dataset Preview
-        </div>
-        """, unsafe_allow_html=True)
+            if len(missing_cols) > 0:
 
-        if uploaded_file is not None:
+                st.error(
+                    f"""
+Missing columns:
 
-            try:
+{missing_cols}
 
-                df = pd.read_csv(uploaded_file)
-
-                st.dataframe(
-                    df.head(),
-                    use_container_width=True
+Required columns:
+- education_mother
+- education_father
+- age_years
+- gender
+                    """
                 )
 
-                missing_cols = [
-                    col for col in required_columns
-                    if col not in df.columns
+                st.stop()
+
+            # =========================================
+            # PREPROCESSING
+            # =========================================
+
+            df_encoded = df.copy()
+
+            # =========================================
+            # GANTI STRING KOSONG JADI NaN
+            # =========================================
+
+            df_encoded = df_encoded.replace(
+                r'^\s*$',
+                np.nan,
+                regex=True
+            )
+
+            # =========================================
+            # HAPUS MISSING VALUE
+            # =========================================
+
+            jumlah_sebelum = len(df_encoded)
+
+            df_encoded = df_encoded.dropna(
+                subset=required_columns
+            )
+
+            jumlah_sesudah = len(df_encoded)
+
+            jumlah_terhapus = (
+                jumlah_sebelum - jumlah_sesudah
+            )
+
+            if len(df_encoded) == 0:
+
+                st.error(
+                    "Semua data terhapus karena missing value."
+                )
+
+                st.stop()
+
+            # =========================================
+            # CLEANING STRING
+            # =========================================
+
+            df_encoded["education_mother"] = (
+                df_encoded["education_mother"]
+                .astype(str)
+                .str.strip()
+                .str.lower()
+                .str.replace(r"\s+", " ", regex=True)
+            )
+
+            df_encoded["education_father"] = (
+                df_encoded["education_father"]
+                .astype(str)
+                .str.strip()
+                .str.lower()
+                .str.replace(r"\s+", " ", regex=True)
+            )
+
+            df_encoded["gender"] = (
+                df_encoded["gender"]
+                .astype(str)
+                .str.strip()
+                .str.lower()
+            )
+
+            # =========================================
+            # AGE CONVERSION
+            # =========================================
+
+            df_encoded["age_years"] = pd.to_numeric(
+                df_encoded["age_years"],
+                errors="coerce"
+            )
+
+            # =========================================
+            # ENCODING
+            # =========================================
+
+            df_encoded["education_mother"] = (
+                df_encoded["education_mother"]
+                .map(reverse_edu_map)
+            )
+
+            df_encoded["education_father"] = (
+                df_encoded["education_father"]
+                .map(reverse_edu_map)
+            )
+
+            df_encoded["gender"] = (
+                df_encoded["gender"]
+                .map(reverse_gender_map)
+            )
+
+            # =========================================
+            # VALIDASI KATEGORI
+            # =========================================
+
+            invalid_edu_mother = df_encoded[
+                df_encoded["education_mother"].isnull()
+            ]
+
+            invalid_edu_father = df_encoded[
+                df_encoded["education_father"].isnull()
+            ]
+
+            invalid_gender = df_encoded[
+                df_encoded["gender"].isnull()
+            ]
+
+            error_message = ""
+
+            if len(invalid_edu_mother) > 0:
+
+                error_message += (
+                    "\n• Education Mother tidak valid"
+                )
+
+            if len(invalid_edu_father) > 0:
+
+                error_message += (
+                    "\n• Education Father tidak valid"
+                )
+
+            if len(invalid_gender) > 0:
+
+                error_message += (
+                    "\n• Gender tidak valid"
+                )
+
+            if error_message != "":
+
+                st.error(
+                    f"""
+Terdapat kategori yang tidak sesuai.
+
+{error_message}
+
+Gunakan format berikut:
+
+Education:
+- primary or lower secondary
+- vocational
+- secondary
+- higher
+
+Gender:
+- male
+- female
+"""
+                )
+
+                st.stop()
+
+            # =========================================
+            # FEATURE SELECTION
+            # =========================================
+
+            X = df_encoded[[
+                "education_mother",
+                "education_father",
+                "age_years",
+                "gender"
+            ]]
+
+            # =========================================
+            # SCALING
+            # =========================================
+
+            X_scaled = scaler.transform(X)
+
+            # =========================================
+            # PREDICTION
+            # =========================================
+
+            predictions = model.predict(X_scaled)
+
+            # =========================================
+            # PROBABILITY
+            # =========================================
+
+            probabilities = model.predict_proba(X_scaled)
+
+            confidence_scores = (
+                np.max(probabilities, axis=1) * 100
+            )
+
+            # =========================================
+            # LABEL MAPPING
+            # =========================================
+
+            predicted_labels = [
+                iq_labels[p]
+                for p in predictions
+            ]
+
+            # =========================================
+            # OUTPUT
+            # =========================================
+
+            result_df = pd.DataFrame({
+
+                "education_mother":
+                    df.loc[
+                        df_encoded.index,
+                        "education_mother"
+                    ],
+
+                "education_father":
+                    df.loc[
+                        df_encoded.index,
+                        "education_father"
+                    ],
+
+                "age_years":
+                    df.loc[
+                        df_encoded.index,
+                        "age_years"
+                    ],
+
+                "gender":
+                    df.loc[
+                        df_encoded.index,
+                        "gender"
+                    ],
+
+                "predicted_iq_category":
+                    predicted_labels,
+
+                "confidence_score (%)": [
+                    f"{x:.2f}%"
+                    for x in confidence_scores
                 ]
 
-                if len(missing_cols) > 0:
+            })
 
-                    st.error(
-                        f"Missing columns: {missing_cols}"
-                    )
+            # =========================================
+            # STATUS
+            # =========================================
 
-                else:
+            st.success(
+                "Prediction completed successfully."
+            )
 
-                    df_encoded = df.copy()
+            st.info(
+                f"""
+Jumlah data diproses: {len(result_df)}
 
-                    df_encoded["education_mother"] = (
-                        df_encoded["education_mother"]
-                        .astype(str)
-                        .str.strip()
-                        .str.lower()
-                    )
+Baris dihapus: {jumlah_terhapus}
+                """
+            )
 
-                    df_encoded["education_father"] = (
-                        df_encoded["education_father"]
-                        .astype(str)
-                        .str.strip()
-                        .str.lower()
-                    )
+            # =========================================
+            # DISPLAY RESULT
+            # =========================================
 
-                    df_encoded["gender"] = (
-                        df_encoded["gender"]
-                        .astype(str)
-                        .str.strip()
-                        .str.lower()
-                    )
+            st.subheader("✅ Prediction Results")
 
-                    df_encoded["education_mother"] = (
-                        df_encoded["education_mother"]
-                        .map(reverse_edu_map)
-                    )
+            display_columns = [
+                "education_mother",
+                "education_father",
+                "age_years",
+                "gender",
+                "predicted_iq_category",
+                "confidence_score (%)"
+            ]
 
-                    df_encoded["education_father"] = (
-                        df_encoded["education_father"]
-                        .map(reverse_edu_map)
-                    )
+            st.dataframe(
+                result_df[display_columns],
+                use_container_width=True
+            )
 
-                    df_encoded["gender"] = (
-                        df_encoded["gender"]
-                        .map(reverse_gender_map)
-                    )
+            # =========================================
+            # DISTRIBUTION CHART
+            # =========================================
 
-                    X = df_encoded[
-                        required_columns
-                    ]
+            st.subheader("📈 Prediction Distribution")
 
-                    X_scaled = scaler.transform(X)
+            category_counts = (
+                result_df["predicted_iq_category"]
+                .value_counts()
+            )
 
-                    predictions = model.predict(X_scaled)
+            fig2, ax2 = plt.subplots(
+                figsize=(10, 5)
+            )
 
-                    probabilities = (
-                        model.predict_proba(X_scaled)
-                    )
+            bars = ax2.bar(
+                category_counts.index,
+                category_counts.values
+            )
 
-                    confidence_scores = (
-                        np.max(probabilities, axis=1) * 100
-                    )
+            # Add labels above bars
+            for bar in bars:
 
-                    result_df = df.copy()
+                height = bar.get_height()
 
-                    result_df[
-                        "predicted_iq_category"
-                    ] = [
-                        iq_labels[p]
-                        for p in predictions
-                    ]
+                ax2.text(
+                    bar.get_x() + bar.get_width()/2,
+                    height + 0.2,
+                    str(height),
+                    ha='center'
+                )
 
-                    result_df[
-                        "confidence_score (%)"
-                    ] = [
-                        f"{x:.2f}%"
-                        for x in confidence_scores
-                    ]
+            ax2.set_ylabel("Number of Data")
+            ax2.set_xlabel("IQ Category")
 
-                    st.success(
-                        "Prediction completed successfully."
-                    )
+            plt.xticks(rotation=10)
 
-                    st.dataframe(
-                        result_df,
-                        use_container_width=True
-                    )
+            st.pyplot(fig2)
 
-                    csv = (
-                        result_df
-                        .to_csv(index=False)
-                        .encode("utf-8")
-                    )
+            # =========================================
+            # DOWNLOAD
+            # =========================================
 
-                    st.download_button(
-                        label="⬇ Download Prediction Result",
-                        data=csv,
-                        file_name="prediction_result.csv",
-                        mime="text/csv"
-                    )
+            csv = (
+                result_df
+                .to_csv(index=False)
+                .encode("utf-8")
+            )
 
-            except Exception as e:
+            st.download_button(
+                label="⬇ Download Prediction Result",
+                data=csv,
+                file_name="prediction_result.csv",
+                mime="text/csv"
+            )
 
-                st.error(f"CSV Error: {e}")
+        except Exception as e:
 
-        else:
-
-            st.markdown("""
-            <div class="info-box">
-                Upload CSV file first to preview dataset.
-            </div>
-            """, unsafe_allow_html=True)
-
-        st.markdown("</div>", unsafe_allow_html=True)
+            st.error(f"ERROR:\n\n{str(e)}")
 
 # =========================================
-# ABOUT
+# ABOUT MODEL
 # =========================================
 
-elif menu == "About":
+elif menu == "About Model":
+
+    st.subheader("📘 About Model")
 
     st.markdown("""
-    <div class="hero-card">
+    ### Model Information
 
-        <div class="main-title">
-            About RapIQ
-        </div>
+    - Algorithm : Multilayer Perceptron (MLP)
+    - Hidden Layer : (10, 6)
+    - Activation : ReLU
+    - Optimizer : Adam
+    - Feature Scaling : StandardScaler
+    - Oversampling : SMOTE
 
-        <div class="main-desc">
-            RapIQ is an AI-powered cognitive
-            classification system designed
-            for rapid IQ category prediction
-            using Multilayer Perceptron architecture.
-        </div>
+    ### Input Features
 
-    </div>
-    """, unsafe_allow_html=True)
+    - Mother Education
+    - Father Education
+    - Age
+    - Gender
 
-    metric_titles = [
-        "Accuracy",
-        "F1-Score",
-        "Dataset",
-        "Latency"
-    ]
+    ### Output Classes
 
-    metric_values = [
-        "94.2%",
-        "0.93",
-        "80k+",
-        "12ms"
-    ]
+    - Moderate ID
+    - Mild ID
+    - Below Average
+    - Average
+    - Above Average
+    """)
 
-    cols = st.columns(4)
+    st.info(
+        "Model trained using Stanford-Binet Intelligence Scales dataset."
+    )
 
-    for i in range(4):
+    st.warning(
+        """
+Disclaimer:
 
-        with cols[i]:
+Model dibuat menggunakan dataset penelitian terbatas
+dan tidak dapat digunakan sebagai alat diagnosis klinis.
 
-            st.markdown(f"""
-            <div class="metric-card">
-
-                <div class="small-label">
-                    {metric_titles[i]}
-                </div>
-
-                <div style="
-                    font-size:44px;
-                    font-weight:800;
-                    color:#00D4FF;
-                ">
-                    {metric_values[i]}
-                </div>
-
-            </div>
-            """, unsafe_allow_html=True)
-
-    st.markdown("<br>", unsafe_allow_html=True)
-
-    left, right = st.columns([2,1])
-
-    with left:
-
-        st.markdown("""
-        <div class="glass-card">
-
-        <div class="section-title">
-            🧠 Model Information
-        </div>
-
-        <ul style="
-            line-height:2;
-            color:#DCE7F3;
-            font-size:17px;
-        ">
-            <li>Algorithm : MLP Classifier</li>
-            <li>Hidden Layer : (10, 6)</li>
-            <li>Activation : ReLU</li>
-            <li>Optimizer : Adam</li>
-            <li>Scaling : StandardScaler</li>
-            <li>Oversampling : SMOTE</li>
-        </ul>
-
-        </div>
-        """, unsafe_allow_html=True)
-
-    with right:
-
-        st.markdown("""
-        <div class="glass-card">
-
-        <div class="section-title">
-            ⚠ Disclaimer
-        </div>
-
-        <p style="
-            color:#C7D5E4;
-            line-height:2;
-            font-size:16px;
-        ">
-
-        RapIQ is developed for educational
-        and research purposes only.
-
-        This system is NOT intended
-        to replace professional
-        psychological diagnosis.
-
-        </p>
-
-        </div>
-        """, unsafe_allow_html=True)
+Confidence score merupakan probabilitas model,
+bukan probabilitas klinis nyata.
+        """
+    )
