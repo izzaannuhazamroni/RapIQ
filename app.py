@@ -8,7 +8,6 @@ import pandas as pd
 import numpy as np
 import joblib
 import matplotlib.pyplot as plt
-import seaborn as sns
 
 # =========================================
 # PAGE CONFIG
@@ -348,14 +347,20 @@ Required columns:
 
             df_encoded = df.copy()
 
-            # Ubah string kosong jadi NaN
+            # =========================================
+            # GANTI STRING KOSONG JADI NaN
+            # =========================================
+
             df_encoded = df_encoded.replace(
                 r'^\s*$',
                 np.nan,
                 regex=True
             )
 
-            # Hapus missing value
+            # =========================================
+            # HAPUS MISSING VALUE
+            # =========================================
+
             jumlah_sebelum = len(df_encoded)
 
             df_encoded = df_encoded.dropna(
@@ -435,10 +440,45 @@ Required columns:
             # VALIDASI KATEGORI
             # =========================================
 
-            if df_encoded.isnull().sum().sum() > 0:
+            invalid_edu_mother = df_encoded[
+                df_encoded["education_mother"].isnull()
+            ]
 
-                st.error("""
-Terdapat kategori yang tidak valid.
+            invalid_edu_father = df_encoded[
+                df_encoded["education_father"].isnull()
+            ]
+
+            invalid_gender = df_encoded[
+                df_encoded["gender"].isnull()
+            ]
+
+            error_message = ""
+
+            if len(invalid_edu_mother) > 0:
+
+                error_message += (
+                    "\n• Education Mother tidak valid"
+                )
+
+            if len(invalid_edu_father) > 0:
+
+                error_message += (
+                    "\n• Education Father tidak valid"
+                )
+
+            if len(invalid_gender) > 0:
+
+                error_message += (
+                    "\n• Gender tidak valid"
+                )
+
+            if error_message != "":
+
+                st.error(
+                    f"""
+Terdapat kategori yang tidak sesuai.
+
+{error_message}
 
 Gunakan format berikut:
 
@@ -451,7 +491,8 @@ Education:
 Gender:
 - male
 - female
-                """)
+"""
+                )
 
                 st.stop()
 
@@ -579,35 +620,30 @@ Baris dihapus: {jumlah_terhapus}
 
             st.subheader("📈 Prediction Distribution")
 
+            category_counts = (
+                result_df["predicted_iq_category"]
+                .value_counts()
+            )
+
             fig2, ax2 = plt.subplots(
                 figsize=(10, 5)
             )
 
-            sns.countplot(
-                x=result_df[
-                    "predicted_iq_category"
-                ],
-                palette="viridis",
-                ax=ax2
+            bars = ax2.bar(
+                category_counts.index,
+                category_counts.values
             )
 
             # Add labels above bars
-            for p in ax2.patches:
+            for bar in bars:
 
-                jumlah = int(p.get_height())
+                height = bar.get_height()
 
-                ax2.annotate(
-                    str(jumlah),
-
-                    (
-                        p.get_x() + p.get_width()/2,
-                        p.get_height()
-                    ),
-
-                    ha='center',
-                    va='bottom',
-                    fontsize=11,
-                    fontweight='bold'
+                ax2.text(
+                    bar.get_x() + bar.get_width()/2,
+                    height + 0.2,
+                    str(height),
+                    ha='center'
                 )
 
             ax2.set_ylabel("Number of Data")
