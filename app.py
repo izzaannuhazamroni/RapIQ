@@ -102,7 +102,7 @@ section[data-testid="stSidebar"] {
 
     border-radius: 12px !important;
 
-    margin: 6px 14px !important;
+    margin: 6px 10px !important;
     padding: 14px 16px !important;
 
     transition: all 0.2s ease !important;
@@ -121,11 +121,18 @@ section[data-testid="stSidebar"] {
     color: var(--text-primary) !important;
 }
 .nav-link.active {
-        background: linear-gradient(
+    background: linear-gradient(
         135deg,
-        rgba(56,189,248,0.12),
-        rgba(139,92,246,0.10)
+        rgba(56,189,248,0.16),
+        rgba(139,92,246,0.14)
     ) !important;
+
+    border: 1px solid rgba(56,189,248,0.18) !important;
+
+    box-shadow:
+        0 0 12px rgba(56,189,248,0.06),
+        inset 0 1px 0 rgba(255,255,255,0.03) !important;
+}
 
     color: var(--accent-blue) !important;
 
@@ -137,6 +144,31 @@ section[data-testid="stSidebar"] {
 }
 .nav-link-selected {
     background: linear-gradient(135deg, #38BDF820, #8B5CF620) !important;
+}
+/* ========================================
+   OPTION MENU FULL DARK FIX
+======================================== */
+
+/* Remove white menu container */
+[data-testid="stSidebar"] ul {
+    background: transparent !important;
+}
+
+/* Option menu wrapper */
+[data-testid="stSidebar"] nav {
+    background: transparent !important;
+}
+
+/* Remove white block */
+[data-testid="stSidebar"] .css-1d391kg,
+[data-testid="stSidebar"] .css-163ttbj,
+[data-testid="stSidebar"] .css-1wrcr25 {
+    background: transparent !important;
+}
+
+/* Force menu area dark */
+[data-testid="stSidebar"] section {
+    background: transparent !important;
 }
 /* Remove default menu background */
 ul[data-testid="stSidebarNavItems"] {
