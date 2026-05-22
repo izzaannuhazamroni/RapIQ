@@ -854,10 +854,24 @@ if selected == "Dashboard":
                 ))
 
                 fig.update_layout(
-                    **PLOT_LAYOUT,
-                    title=dict(text="Confidence Probability", font=dict(size=13, color="#7C9CBF"), x=0),
+                    paper_bgcolor=PLOT_LAYOUT["paper_bgcolor"],
+                    plot_bgcolor=PLOT_LAYOUT["plot_bgcolor"],
+                    font=PLOT_LAYOUT["font"],
+                    margin=PLOT_LAYOUT["margin"],
+                    xaxis=PLOT_LAYOUT["xaxis"],
+                    yaxis=dict(
+                        gridcolor="#1E2D4A",
+                        zerolinecolor="#1E2D4A",
+                        tickfont=dict(size=11, color="#4A6080"),
+                        range=[0, 110]
+                    ),
+                    hoverlabel=PLOT_LAYOUT["hoverlabel"],
+                    title=dict(
+                        text="Confidence Probability",
+                        font=dict(size=13, color="#7C9CBF"),
+                        x=0
+                    ),
                     height=300,
-                    yaxis=dict(**PLOT_LAYOUT["yaxis"], range=[0, 110]),
                     bargap=0.35,
                     showlegend=False,
                 )
@@ -1067,11 +1081,24 @@ elif selected == "Bulk Prediction":
                         hovertemplate="<b>%{x}</b><br>%{y} samples<extra></extra>",
                     ))
                     fig2.update_layout(
-                        **PLOT_LAYOUT,
+                        paper_bgcolor=PLOT_LAYOUT["paper_bgcolor"],
+                        plot_bgcolor=PLOT_LAYOUT["plot_bgcolor"],
+                        font=PLOT_LAYOUT["font"],
+                        margin=PLOT_LAYOUT["margin"],
+                        xaxis=PLOT_LAYOUT["xaxis"],
+                        yaxis=dict(
+                            gridcolor="#1E2D4A",
+                            zerolinecolor="#1E2D4A",
+                            tickfont=dict(size=11, color="#4A6080"),
+                            title=dict(
+                                text="Samples",
+                                font=dict(size=11)
+                            )
+                        ),
+                        hoverlabel=PLOT_LAYOUT["hoverlabel"],
                         height=280,
                         bargap=0.3,
                         showlegend=False,
-                        yaxis=dict(**PLOT_LAYOUT["yaxis"], title=dict(text="Samples", font=dict(size=11))),
                     )
                     st.plotly_chart(fig2, use_container_width=True, config={"displayModeBar": False})
                     st.markdown("</div>", unsafe_allow_html=True)
