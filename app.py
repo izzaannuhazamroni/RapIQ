@@ -73,12 +73,23 @@ st.markdown("""
 
 /* ── Sidebar ── */
 [data-testid="stSidebar"] {
-    background: var(--bg-sidebar) !important;
-    border-right: 1px solid var(--border) !important;
-    width: 240px !important;
+    background: #020817 !important;
+
+    border-right: 1px solid #0F172A !important;
+
+    width: 250px !important;
 }
+
+/* Inner sidebar container */
 [data-testid="stSidebar"] > div:first-child {
+    background: #020817 !important;
+
     padding: 0 !important;
+}
+
+/* Sidebar content wrapper */
+section[data-testid="stSidebar"] {
+    background: #020817 !important;
 }
 
 /* ── Option menu overrides ── */
@@ -110,7 +121,11 @@ st.markdown("""
     color: var(--text-primary) !important;
 }
 .nav-link.active {
-    background: linear-gradient(135deg, #38BDF820, #8B5CF620) !important;
+        background: linear-gradient(
+        135deg,
+        rgba(56,189,248,0.12),
+        rgba(139,92,246,0.10)
+    ) !important;
 
     color: var(--accent-blue) !important;
 
@@ -122,6 +137,15 @@ st.markdown("""
 }
 .nav-link-selected {
     background: linear-gradient(135deg, #38BDF820, #8B5CF620) !important;
+}
+/* Remove default menu background */
+ul[data-testid="stSidebarNavItems"] {
+    background: transparent !important;
+}
+
+/* Option menu container */
+nav {
+    background: transparent !important;
 }
 .nav-link span {
     overflow: hidden !important;
@@ -303,26 +327,56 @@ st.markdown("""
     flex-direction: row !important;
     gap: 10px !important;
 }
+[data-testid="stRadio"] > div {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 14px !important;
+}
+
+/* Radio card */
 [data-testid="stRadio"] label {
     background: #070E1E !important;
+
     border: 1px solid var(--border) !important;
-    border-radius: 10px !important;
-    padding: 10px 22px !important;
+
+    border-radius: 14px !important;
+
+    padding: 12px 18px !important;
+
     color: var(--text-secondary) !important;
-    font-size: 13.5px !important;
+
+    font-size: 14px !important;
     font-weight: 500 !important;
+
     cursor: pointer !important;
-    transition: all 0.2s !important;
 
-    flex: 1 !important;
-    min-width: 120px !important;
+    transition: all 0.2s ease !important;
 
-    text-align: center !important;
+    min-width: 150px !important;
+
     white-space: nowrap !important;
+}
 
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+/* Hover */
+[data-testid="stRadio"] label:hover {
+    border-color: #38BDF850 !important;
+    color: var(--text-primary) !important;
+    background: #0A1220 !important;
+}
+
+/* Checked */
+[data-testid="stRadio"] label[data-checked="true"] {
+    border-color: #38BDF860 !important;
+
+    background: linear-gradient(
+        135deg,
+        #38BDF815,
+        #8B5CF610
+    ) !important;
+
+    color: #38BDF8 !important;
+
+    box-shadow: 0 0 18px rgba(56,189,248,0.08) !important;
 }
 [data-testid="stRadio"] label:hover {
     border-color: #38BDF850 !important;
