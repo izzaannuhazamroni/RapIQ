@@ -84,13 +84,26 @@ st.markdown("""
 /* ── Option menu overrides ── */
 .nav-link {
     font-family: 'Plus Jakarta Sans', sans-serif !important;
-    font-size: 13.5px !important;
+    font-size: 14px !important;
     font-weight: 500 !important;
+
     color: var(--text-secondary) !important;
-    border-radius: 10px !important;
-    margin: 2px 12px !important;
-    padding: 10px 14px !important;
+
+    border-radius: 12px !important;
+
+    margin: 6px 14px !important;
+    padding: 14px 16px !important;
+
     transition: all 0.2s ease !important;
+
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+
+    min-height: 52px !important;
 }
 .nav-link:hover {
     background: #1E2D4A30 !important;
@@ -98,14 +111,27 @@ st.markdown("""
 }
 .nav-link.active {
     background: linear-gradient(135deg, #38BDF820, #8B5CF620) !important;
+
     color: var(--accent-blue) !important;
+
     border: 1px solid #38BDF830 !important;
+
     font-weight: 600 !important;
+
+    box-shadow: 0 4px 18px rgba(56, 189, 248, 0.08) !important;
 }
 .nav-link-selected {
     background: linear-gradient(135deg, #38BDF820, #8B5CF620) !important;
 }
+.nav-link span {
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
 
+.nav-link i {
+    font-size: 16px !important;
+    min-width: 18px !important;
+}
 /* ── Main content padding ── */
 .main .block-container {
     padding: 2rem 2.5rem 3rem !important;
@@ -287,8 +313,16 @@ st.markdown("""
     font-weight: 500 !important;
     cursor: pointer !important;
     transition: all 0.2s !important;
+
     flex: 1 !important;
+    min-width: 120px !important;
+
     text-align: center !important;
+    white-space: nowrap !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 }
 [data-testid="stRadio"] label:hover {
     border-color: #38BDF850 !important;
@@ -474,18 +508,62 @@ st.markdown("""
 }
 
 /* ── File uploader ── */
+/* ── File uploader ── */
+
 [data-testid="stFileUploader"] {
     background: #070E1E !important;
     border: 1px dashed var(--border) !important;
     border-radius: var(--radius-lg) !important;
-    transition: border-color 0.2s !important;
+    padding: 12px !important;
+    transition: all 0.2s ease !important;
 }
+
 [data-testid="stFileUploader"]:hover {
     border-color: #38BDF850 !important;
+    background: #0A1220 !important;
 }
-[data-testid="stFileUploader"] label {
+
+/* Remove white default block */
+section[data-testid="stFileUploaderDropzone"] {
+    background: transparent !important;
+    border: none !important;
+}
+
+/* Upload text */
+[data-testid="stFileUploader"] label,
+[data-testid="stFileUploader"] small,
+[data-testid="stFileUploader"] span {
     color: var(--text-secondary) !important;
-    font-size: 13.5px !important;
+    font-size: 13px !important;
+}
+
+/* Upload button */
+[data-testid="stFileUploader"] button {
+    background: linear-gradient(135deg, #38BDF815, #8B5CF615) !important;
+
+    border: 1px solid #38BDF830 !important;
+
+    color: #38BDF8 !important;
+
+    border-radius: 10px !important;
+
+    font-size: 13px !important;
+    font-weight: 600 !important;
+
+    padding: 8px 18px !important;
+
+    transition: all 0.2s ease !important;
+}
+
+/* Upload button hover */
+[data-testid="stFileUploader"] button:hover {
+    border-color: #38BDF860 !important;
+
+    background: linear-gradient(135deg, #38BDF825, #8B5CF625) !important;
+
+    color: #67D3FF !important;
+
+    transform: translateY(-1px) !important;
 }
 
 /* ── Tags / badges ── */
@@ -657,7 +735,7 @@ with st.sidebar:
     <div class="sidebar-logo">
         <div class="logo-mark">🧠</div>
         <div class="logo-name">RapIQ</div>
-        <div class="logo-sub">MLP Architecture: (10,6)</div>
+        <div class="logo-sub">MLP Architecture: (64,64)</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -744,9 +822,9 @@ if selected == "Dashboard":
         <div class="hero-title" style="margin-top:14px">RapIQ</div>
         <div class="hero-subtitle">AI-powered pediatric IQ category prediction using a Multilayer Perceptron (MLP) architecture trained on the Stanford-Binet Intelligence Scales dataset.</div>
         <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:4px">
-            <span class="tag tag-blue">MLP (10,6)</span>
+            <span class="tag tag-blue">MLP (64,64)</span>
             <span class="tag tag-purple">5 Classes</span>
-            <span class="tag tag-green">94.2% Accuracy</span>
+            <span class="tag tag-green">53.66% Accuracy</span>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -1140,8 +1218,8 @@ elif selected == "About Model":
     # Metric cards
     m1, m2, m3, m4 = st.columns(4, gap="medium")
     metrics = [
-        ("📊", "Accuracy Score", "94.2%", "Weighted across all classes", "#38BDF8"),
-        ("🎯", "F1-Score (Weighted)", "0.93", "Macro-averaged F1", "#8B5CF6"),
+        ("📊", "Accuracy Score", "53.66%", "Weighted across all classes", "#38BDF8"),
+        ("🎯", "F1-Score (Weighted)", "46.40%", "Macro-averaged F1", "#8B5CF6"),
         ("🗃️", "Samples Processed", "~80k", "Stanford-Binet Dataset", "#06B6D4"),
         ("⚡", "Model Latency", "12ms", "Average response time", "#22C55E"),
     ]
